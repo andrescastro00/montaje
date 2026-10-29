@@ -228,3 +228,70 @@ el habla real se parte en segmentos cortos.
 Los scripts que miden audio llevan `/usr/bin/python3` explícito en el shebang.
 Un `brew upgrade` puede cambiar esto en mitad de una sesión: a mí se me cayó
 entre un script y el siguiente.
+
+---
+
+## 13. El RT60 no se mide con una recta sobre la envolvente
+
+Medí el eco de un cuarto normal y me dio **1,5 s**, que es una iglesia. Lo
+volví a medir con otra ventana y me dio 0,76. Con otra, 0,92. Ninguna servía
+para decidir nada.
+
+La causa, mirando la caída de verdad (dB respecto a la palabra que acaba):
+
+```
+ms tras la palabra    0    40    80   120   160   200   240   280
+dB                  -13   -19   -26   -32   -36   -37   -32   -30
+                                               ^ aquí ya es el piso de ruido
+```
+
+A los ~180 ms la curva **toca el piso de ruido y se aplana**. Un tramo plano
+ajustado a una recta extrapola a un RT60 enorme, y cuanto más larga la ventana,
+más absurdo el número.
+
+**Lo que sí funciona:** promediar la caída de todas las pausas reales, tirar la
+parte que ya está a menos de 8 dB del piso, ajustar entre −10 y −30 dB (T20) y
+extrapolar por tres. En esa toma: **0,37 s**, que es un cuarto sin tratar, y
+coincide con lo que se ve en la tabla.
+
+Y la regla de arriba: **cuando una medida sale distinta cada vez que se cambia
+la ventana, no se usa para decidir. Se imprime la curva cruda y se mira.** Me
+costó tres barridos de parámetros guiados por un número que no significaba nada.
+
+---
+
+## 14. No se "corrige" la banda que uno mismo vació
+
+El corrector de tono pedía **+10 dB en 80 Hz**. Normal: el paso anterior era un
+`highpass=f=85`, así que esa banda medía −217 dB. El corrector veía un hueco
+enorme y quería rellenarlo, o sea devolver el retumbe que se acababa de quitar.
+
+Dos topes, los dos por el mismo motivo:
+
+- **Por debajo del filtro de graves, corrección = 0.** El hueco está ahí a
+  propósito.
+- **Por encima de 12,5 kHz, solo cortar, nunca realzar.** Un AAC de 64 kbps
+  (lo que graba Notas de Voz) no guardó nada allá arriba: realzar sube el ruido
+  del propio codec. En esa toma, 16 kHz estaba a −48 dB y el corrector pedía
+  +3,3.
+
+> Si una banda está vacía, primero hay que preguntarse si la vació uno mismo.
+
+---
+
+## 15. No se instalan modelos en el python del sistema
+
+`pip install deepfilternet` en `/usr/bin/python3` **degradó numpy de 2.0.2 a
+1.26.4** (el paquete exige `numpy<2`) y de paso rompió `opencv-python-headless`,
+que pide `numpy>=2`. Y después no sirvió: necesita `torchaudio`, que no estaba.
+
+`/usr/bin/python3` es el único que tiene numpy y scipy (GOTCHAS 12), o sea que
+es el que usa todo lo que mide audio aquí. Degradarlo rompe cosas que no tienen
+nada que ver con lo que se estaba haciendo.
+
+**Regla:** un modelo va en su propio entorno o no va. Y antes de instalar algo
+que arrastre numpy, torch o scipy, se mira qué versión pide. Si pide un pin
+viejo, se descarta.
+
+Lo que sí se puede instalar sin romper nada, y es lo que resolvió el problema:
+`nara_wpe` (puro numpy/scipy, desreverberación WPE).

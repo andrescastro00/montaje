@@ -312,3 +312,58 @@ mezcla.**
 Si whisper lee la mezcla final palabra por palabra, se entiende. Si se come
 palabras, la cama está muy arriba. Es la única prueba de inteligibilidad que
 puede correr un agente que no oye.
+
+**9.9 · Una grabación tiene tres defectos distintos, y quitar ruido solo toca
+uno.**
+Se confunden todo el tiempo y se arreglan con herramientas distintas:
+
+| Defecto | Qué es | Qué suena | Con qué se quita |
+|---|---|---|---|
+| Ruido | fondo constante que no depende de la voz | zumbido, aire | `afftdn` (`sonido_limpio.py`) |
+| Eco | la propia voz rebotando con retardo | hueco, lejano | WPE (`realzar_voz.py`) |
+| Tono | el micrófono oyó mal el reparto de graves y agudos | apagado, sin calidad | EQ medida (`realzar_voz.py`) |
+
+El tercero es el que más se siente y el que yo me salté: entregué la locución
+de Santiago con +9 dB de separación voz-ruido y él la oyó mal igual, porque el
+problema no era el ruido. Medido en su toma: **2,5 kHz estaba 22 dB por debajo
+del pico de 200 Hz**, cuando en locución eso son 12. Una voz así suena
+retumbada y lejana, y eso es lo que un oído sin entrenar llama "eco".
+
+**9.10 · El tono se corrige midiendo, no de oído y nunca con una receta.**
+Se saca el espectro promedio de los cuadros CON voz, se compara banda por banda
+(tercios de octava) contra una curva de locución, y la diferencia es la
+corrección. Tres frenos que son parte de la regla:
+
+- **Techo de ±10 dB.** Más que eso no es ecualizar, es inventar lo que el
+  micrófono no capturó.
+- **Repartir entre cortar y realzar**, no solo realzar: bajar el retumbe de
+  200 Hz suena igual que subir la presencia y no sube el ruido con ella.
+- **No tocar lo que un filtro propio dejó vacío** (GOTCHAS 14).
+
+En la toma de Santiago salieron −6 dB en 200 Hz y +5 dB en 3,15 kHz: una
+inclinación de +7,3 dB hacia la presencia. El error medio contra la curva de
+locución bajó de 4,5 a 2,4 dB.
+
+**9.11 · Primero el eco, después el tono, y el de-esser al final.**
+El orden no es decorativo. Realzar la presencia antes de quitar el eco realza
+el eco; y realzar la presencia siempre sube el siseo de las eses, así que el
+de-esser va **después** del EQ, nunca antes. Orden completo:
+
+```
+highpass 85  →  WPE (eco)  →  EQ medida (tono)  →  afftdn (ruido)
+             →  de-esser  →  compresor  →  loudnorm en pasada aparte
+```
+
+**9.12 · Lo que NO se puede hacer, y hay que decirlo.**
+Adobe Enhance Speech no tiene equivalente instalado. Lo que hace Adobe es
+**resintetizar** la voz con un modelo generativo: queda impecable y a veces deja
+de ser la voz de la persona. El camino abierto más parecido es
+`resemble-enhance`, que pide Python 3.10+ (aquí hay 3.9 y 3.15) y arrastra
+`deepspeed`. `deepfilternet` sí instala, pero exige `numpy<2` y degrada el numpy
+del sistema (GOTCHAS 15).
+
+Entonces: `realzar_voz.py` solo **resta y ecualiza**. No puede inventar lo que
+el micrófono no capturó, pero tampoco puede cambiar a quien habla. Si hace falta
+más, la salida honesta es decirlo y ofrecerle a Santiago pasar el archivo por
+Adobe Podcast él mismo: es su voz y es su decisión subirla a un servicio
+ajeno, no la mía.
