@@ -265,3 +265,50 @@ Cosas que todavía no son regla porque no se han probado:
 - Si el bed instrumental va o no va en piezas cortas de marca.
 - Paleta y tipografía de subtítulos para RegiaVía en vertical.
 - Reglas propias de Diego (todavía no ha dado ninguna nota).
+
+---
+
+## 9. Locución propia
+
+**9.1 · Si hay voz del dueño, gana.**
+Una voz de biblioteca, aunque sea colombiana, suena a banco de voces. La del
+dueño del taller suena a taller. Antes de pagar locución, preguntar si graba.
+
+**9.2 · El guion se entrega con instrucciones de grabación, no solo con texto.**
+Lo que decide la calidad es el cuarto, la distancia y el silencio de cabeza,
+no la redacción. Se piden: cuarto con cosas blandas, el celular a un palmo y de
+lado, **cinco segundos de silencio al principio** (es la huella del ruido),
+dos segundos entre tomas, y el archivo original, nunca por WhatsApp (recomprime
+a 16 kHz mono y lo que llegue ya no se arregla).
+
+**9.3 · Se mide la grabación antes de decidir cuánto limpiarla.**
+Separación p95−p5 medida: 49,1 dB en la toma de Santiago. Con eso, la cadena
+`normal` (afftdn nf=−20 + anlmdn) dejó el piso en −110 dB, que es silencio
+digital: se oye procesado. La `suave` (highpass + afftdn nf=−28) dio +9 dB y
+sonido de persona. **Cuanto más limpia llega, menos se le mete.**
+
+**9.4 · Los silencios no se dejan en cero.**
+Un bloque de voz rodeado de nada suena pegado con cinta. Los huecos se rellenan
+con tono de sala del mismo archivo (el rabo, donde no habla), con cruce de
+0,03 s. La costura deja de oírse.
+
+**9.5 · Las fronteras salen de `silencedetect`, nunca de whisper.**
+whisper.cpp interpola y entrega bloques pegados sin huecos (GOTCHAS 1). Para
+saber qué dice cada bloque, se corta por energía y se transcribe cada bloque
+por separado.
+
+**9.6 · Lo cortado se vuelve a leer.**
+Después de montar la voz se transcribe el resultado y se compara con lo que se
+quería dejar. Es la única forma de saber que no se partió una palabra.
+
+**9.7 · Con voz, el texto en pantalla es subtítulo, no titular.**
+Un titular grande que repite lo que se está oyendo es ruido. El texto pasa a
+servirle a quien mira en silencio: dice exactamente lo que se dice, en caja
+baja (se lee más rápido que la versalita de marca) y con la palabra que pesa en
+el color de acento.
+
+**9.8 · La voz se despega 8 dB de la cama, y se comprueba transcribiendo la
+mezcla.**
+Si whisper lee la mezcla final palabra por palabra, se entiende. Si se come
+palabras, la cama está muy arriba. Es la única prueba de inteligibilidad que
+puede correr un agente que no oye.

@@ -157,3 +157,74 @@ Y sacar el umbral de ahí. En este material, −33 dB con mínimo 0,30 s.
 
 > **Un umbral en dB copiado de un tutorial es una adivinanza.** El mismo número
 > que funciona en una grabación a cámara da cero en una captura de pantalla.
+
+---
+
+## 9. Animar el `.clip` pelea con HyperFrames
+
+En una composición de HyperFrames, el div con `class="clip"` lo controla el
+motor: él decide cuándo se ve y cuándo no. Si además se le anima la opacidad
+desde GSAP, el subtítulo **se queda pegado en pantalla después de su tiempo**.
+
+Pasó de verdad: "vidrio, cuero," seguía puesto a los 16,0 s cuando su bloque
+terminaba a los 15,02 s. El `lint` lo avisó como `overlapping_gsap_tweens` sobre
+`__unresolved__` y no le hice caso.
+
+```html
+<div id="s8" class="clip marco">        <!-- esto lo maneja HyperFrames -->
+  <div class="sub" id="t8">vidrio, cuero,</div>   <!-- esto se anima -->
+</div>
+```
+
+> **La animación va en el div de adentro, siempre.**
+> Y cuando el `lint` dice `__unresolved__`, es que no pudo resolver el objetivo:
+> mirar qué se está animando antes de renderizar 107 segundos.
+
+---
+
+## 10. `-t` no garantiza fotogramas: `-frames:v` sí
+
+Pedir `-t 2.11` a 30 fps deja 64 fotogramas donde la cuenta son 63. Por sí solo
+no importa; sumado en diez tramos, la imagen termina **5 fotogramas detrás de la
+voz**, y los subtítulos, que sí están puestos en segundos exactos, se desfasan.
+
+Se redondea la línea de tiempo **una sola vez**, entera, y cada tramo se corta
+al número que le toca:
+
+```bash
+CORTES=(0 4.12 7.49 9.60 ... 31.50)
+MARCAS=(); for c in "${CORTES[@]}"; do MARCAS+=( "$(python3 -c "print(round($c*30))")" ); done
+N=$(( MARCAS[i+1] - MARCAS[i] ))
+ffmpeg ... -t "$(python3 -c "print($d+0.3)")" ... -frames:v "$N" ...
+```
+
+Se pide un poco de más con `-t` y se recorta exacto con `-frames:v`.
+
+---
+
+## 11. whisper alucina sobre audio sin voz
+
+El audio de la máquina, sin una sola palabra, devolvió:
+
+```
+[00:00:00.000 --> 00:00:29.980]   ¡Suscríbete al canal!
+[00:00:30.000 --> 00:00:31.380]   Gracias por ver el video.
+```
+
+Se entrenó con subtítulos de YouTube y, cuando no hay nada que transcribir,
+rellena con lo que más vio. **Un bloque de 30 segundos de corrido es la señal**:
+el habla real se parte en segmentos cortos.
+
+> Para preguntar "¿hay voces aquí?", lo que cuenta no es que devuelva texto,
+> sino que devuelva texto **segmentado como habla**.
+
+---
+
+## 12. El `python3` de Homebrew no trae numpy
+
+`which python3` → `/opt/homebrew/bin/python3` (3.15), sin numpy.
+`/usr/bin/python3` (el del sistema) sí lo trae (2.0.2).
+
+Los scripts que miden audio llevan `/usr/bin/python3` explícito en el shebang.
+Un `brew upgrade` puede cambiar esto en mitad de una sesión: a mí se me cayó
+entre un script y el siguiente.
