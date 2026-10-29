@@ -172,6 +172,15 @@ El modelo suma mal y cree su propia suma. Caso medido: pidió 300 s, entregó
 5. una palabra dicha dos veces seguidas
 6. labios que se despegan de la voz
 
+**6.2 bis · Se lee el texto mirando la imagen.** `[28-oct-2026]`
+Antes de dar por buena una escena que lleva texto, se lee el texto **mirando la
+lámina**. Si la imagen no demuestra lo que el texto afirma, la escena está mal
+aunque se vea bonita.
+
+*De dónde salió:* una escena decía "lo que sirve se junta" y mostraba cuatro
+trozos separados, porque al encoger las barras muertas los huecos del `gap`
+sobrevivían. Se veía bien y decía exactamente lo contrario.
+
 **6.3 · Máximo tres intentos de arreglo automático.** Al cuarto, se para y se
 cuenta qué pasa. Un agente dando vueltas sobre el mismo error quema tiempo.
 
