@@ -1,0 +1,385 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=1920, height=1080" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;700&family=Archivo:wght@800&display=swap"
+      rel="stylesheet"
+    />
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+    <style>
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+
+      /* Tokens RegiaVia · 01 Contexto y marca/Manual de marca */
+      :root {
+        --espresso: #1A1310;
+        --crema:    #FAF6F1;
+        --naranja:  #FF6A2B;
+        --arena:    #F4ECE3;
+      }
+
+      html, body {
+        width: 1920px; height: 1080px; overflow: hidden;
+        background: var(--espresso);
+      }
+      body { font-family: "Outfit", system-ui, sans-serif; position: relative; }
+
+      .escena {
+        position: absolute; inset: 0;
+        display: flex; flex-direction: column;
+        align-items: center; justify-content: center;
+        padding: 0 160px;                 /* zona segura */
+      }
+
+      /* ---------- tipografia ---------- */
+      .titular {
+        font-family: "Archivo", system-ui, sans-serif;
+        font-weight: 800;
+        font-size: 104px;
+        line-height: 1.04;
+        letter-spacing: -0.03em;
+        color: var(--crema);
+        text-align: center;
+        max-width: 1480px;
+      }
+      .titular .ac { color: var(--naranja); }
+
+      .pie {
+        margin-top: 44px;
+        font-weight: 300;
+        font-size: 34px;
+        color: var(--crema);
+        opacity: 0.62;
+        text-align: center;
+      }
+
+      /* ---------- capsulas (nunca esquina suave) ---------- */
+      .capsula {
+        display: inline-flex; align-items: center; gap: 14px;
+        padding: 16px 34px;
+        border-radius: 999px;
+        font-weight: 500; font-size: 30px;
+        background: var(--naranja);
+        color: var(--espresso);           /* sobre naranja SIEMPRE espresso */
+        white-space: nowrap;
+      }
+      .capsula.hueca {
+        background: transparent;
+        color: var(--crema);
+        box-shadow: inset 0 0 0 3px rgba(250,246,241,0.30);
+      }
+
+      /* ---------- onda ---------- */
+      .onda {
+        display: flex; align-items: center; gap: 5px;
+        height: 240px; width: 1560px;
+      }
+      .onda i {
+        display: block; flex: 1 1 auto;
+        border-radius: 999px;
+        background: var(--crema);
+        transform-origin: center;
+      }
+
+      .marcas { position: relative; width: 1560px; height: 120px; margin-top: 46px; }
+      .marca  { position: absolute; top: 0; transform: translateX(-50%); }
+
+      /* ---------- lista de palabras ---------- */
+      .palabras { width: 1120px; }
+      .fila {
+        display: flex; align-items: baseline; gap: 36px;
+        padding: 15px 0;
+        border-bottom: 2px solid rgba(250,246,241,0.09);
+      }
+      .ms {
+        font-weight: 500; font-size: 36px;
+        color: var(--naranja);
+        font-variant-numeric: tabular-nums;
+        min-width: 180px;
+      }
+      .pal { font-weight: 300; font-size: 42px; color: var(--crema); }
+
+      /* ---------- vista compuesta ---------- */
+      .compuesta { width: 1560px; }
+      .tira { display: flex; gap: 8px; height: 190px; }
+      .tira b {
+        flex: 1; display: block; border-radius: 10px;
+        background: var(--arena); opacity: 0.22;
+      }
+      .compuesta .onda { height: 150px; margin-top: 20px; width: 100%; }
+      .rotulos {
+        display: flex; gap: 8px; margin-top: 18px;
+        font-weight: 400; font-size: 26px; color: var(--crema); opacity: 0.70;
+      }
+      .rotulos span { flex: 1; text-align: center; }
+
+      .etiqueta {
+        position: absolute; left: 0;
+        font-weight: 500; font-size: 26px;
+        letter-spacing: 0.08em; text-transform: uppercase;
+        color: var(--naranja);
+      }
+
+      /* ---------- reglas ---------- */
+      .reglas { display: flex; flex-direction: column; gap: 30px; align-items: center; }
+
+      /* Escena 3 · la onda queda de fondo, como banda baja. No pelea con el texto. */
+      #onda3 {
+        position: absolute; left: 50%; top: 50%;
+        transform: translate(-50%, -50%);
+        width: 1400px; height: 420px;
+        opacity: 0.085;
+        -webkit-mask-image: linear-gradient(90deg, transparent, #000 18%, #000 82%, transparent);
+                mask-image: linear-gradient(90deg, transparent, #000 18%, #000 82%, transparent);
+      }
+
+      /* Escena 6 · la onda limpia que reemplaza a la cortada */
+      #onda6b { position: absolute; left: 0; top: 0; }
+
+      /* ---------- cierre ---------- */
+      #isotipo { width: 250px; height: 250px; display: block; }
+      .logotipo {
+        margin-top: -22px;
+        font-weight: 700; font-size: 104px;
+        letter-spacing: -0.038em; color: var(--crema);
+      }
+      .logotipo .via { color: var(--naranja); }
+      #regla-cierre {
+        margin-top: 42px; height: 9px; width: 240px;
+        background: var(--naranja); border-radius: 999px;
+      }
+      #firma {
+        margin-top: 40px;
+        font-family: "Archivo", system-ui, sans-serif;
+        font-weight: 800; font-size: 60px;
+        letter-spacing: -0.03em; color: var(--crema);
+        text-transform: uppercase;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root" data-composition-id="main"
+         data-start="0" data-duration="41" data-width="1920" data-height="1080">
+
+      <!-- 1 · 0,0 — el gancho -->
+      <div id="e1" class="clip escena" data-start="0" data-duration="4.4" data-track-index="1">
+        <div class="titular" id="t1">
+          Este video no pasó por una<br /><span class="ac">línea de tiempo</span>.
+        </div>
+      </div>
+
+      <!-- 2 · 4,2 — el material en bruto es un desastre -->
+      <div id="e2" class="clip escena" data-start="4.2" data-duration="5.8" data-track-index="2">
+        <div style="position:relative;">
+          <div class="etiqueta" style="top:-64px;">Material en bruto</div>
+          <div class="onda" id="onda2"></div>
+          <div class="marcas" id="marcas2">
+            <div class="marca" id="m1" style="left:19%;"><span class="capsula">silencio</span></div>
+            <div class="marca" id="m2" style="left:50%;"><span class="capsula">repetición</span></div>
+            <div class="marca" id="m3" style="left:81%;"><span class="capsula">muletilla</span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 3 · 10,0 — el obstaculo real -->
+      <div id="e3" class="clip escena" data-start="10.0" data-duration="4.6" data-track-index="3">
+        <div class="onda" id="onda3" style="position:absolute;opacity:0.13;"></div>
+        <div class="titular" id="t3" style="position:relative;">
+          Pero una máquina no <span class="ac">ve</span><br />ni <span class="ac">oye</span> un video.
+        </div>
+      </div>
+
+      <!-- 4 · 14,6 — entonces lee -->
+      <div id="e4" class="clip escena" data-start="14.6" data-duration="5.4" data-track-index="4">
+        <div class="palabras" id="palabras4"></div>
+        <div class="pie" id="p4">No mira. Lee. Cada palabra con su milisegundo.</div>
+      </div>
+
+      <!-- 5 · 20,0 — la vista compuesta -->
+      <div id="e5" class="clip escena" data-start="20.0" data-duration="6.5" data-track-index="5">
+        <div class="compuesta" style="position:relative;">
+          <div class="etiqueta" style="top:-62px;">Y cuando toca mirar, mira una sola imagen</div>
+          <div class="tira" id="tira5"></div>
+          <div class="onda" id="onda5"></div>
+          <div class="rotulos" id="rot5"></div>
+        </div>
+      </div>
+
+      <!-- 6 · 26,5 — decide donde cortar -->
+      <div id="e6" class="clip escena" data-start="26.5" data-duration="5.5" data-track-index="6">
+        <div style="position:relative;width:1560px;height:240px;">
+          <div class="etiqueta" style="top:-64px;">Ahí decide</div>
+          <div class="onda" id="onda6" style="position:absolute;left:0;top:0;"></div>
+          <div class="onda" id="onda6b"></div>
+        </div>
+        <div class="pie" id="p6">Lo que sobra se va. Lo que sirve se junta.</div>
+      </div>
+
+      <!-- 7 · 32,0 — el limite honesto -->
+      <div id="e7" class="clip escena" data-start="32.0" data-duration="4.6" data-track-index="7">
+        <div class="titular" id="t7" style="font-size:88px;margin-bottom:54px;">
+          El criterio no se descarga.<br />Se <span class="ac">escribe</span>.
+        </div>
+        <div class="reglas" id="reglas7">
+          <span class="capsula hueca">La marca manda sobre el efecto</span>
+          <span class="capsula hueca">Se corta en frase, nunca en palabra</span>
+          <span class="capsula hueca">Ninguna duración sin medirla</span>
+        </div>
+      </div>
+
+      <!-- 8 · 36,5 — la marca -->
+      <div id="e8" class="clip escena" data-start="36.5" data-duration="4.5" data-track-index="8">
+        <svg id="isotipo" viewBox="0 0 100 100" role="img" aria-label="RegiaVia isotipo">
+          <rect id="b1" x="22" y="28" width="56" height="10" rx="5" fill="#FF6A2B" />
+          <rect id="b2" x="31" y="46" width="38" height="10" rx="5" fill="#FAF6F1" />
+          <rect id="b3" x="40" y="64" width="20" height="10" rx="5" fill="#FAF6F1" />
+        </svg>
+        <div class="logotipo" id="logo8">regia<span class="via">via</span></div>
+        <div id="regla-cierre"></div>
+        <div id="firma">Venda más. Gaste menos.</div>
+      </div>
+    </div>
+
+    <script>
+      /* ---------------------------------------------------------------
+         Todo lo que se dibuja es determinista: ninguna llamada a
+         Math.random ni a Date. La misma entrada da el mismo fotograma.
+      ----------------------------------------------------------------*/
+
+      // Altura de cada barra de la onda. Formula fija: suena a voz real
+      // (frases con cuerpo y valles entre ellas) sin ser aleatoria.
+      function altura(i, n) {
+        const x = i / n;
+        const frase = 0.5 + 0.5 * Math.sin(x * Math.PI * 5.5 - 1.1);   // sube y baja por frases
+        const silaba = 0.45 + 0.55 * Math.abs(Math.sin(x * Math.PI * 47));
+        const detalle = 0.82 + 0.18 * Math.sin(x * Math.PI * 131 + 2.3);
+        return Math.max(0.05, frase * silaba * detalle);
+      }
+
+      // Zonas muertas: donde no hay voz la onda cae de verdad.
+      const MUERTAS = [[0.15, 0.23], [0.46, 0.54], [0.77, 0.85]];
+      function esMuerta(x) { return MUERTAS.some(([a, b]) => x >= a && x <= b); }
+
+      function pintarOnda(el, n, conHuecos) {
+        if (!el) return;
+        let html = "";
+        for (let i = 0; i < n; i++) {
+          const x = i / n;
+          let h = altura(i, n);
+          if (conHuecos && esMuerta(x)) h *= 0.07;
+          html += '<i style="height:' + (h * 100).toFixed(2) + '%"></i>';
+        }
+        el.innerHTML = html;
+      }
+
+      pintarOnda(document.getElementById("onda2"), 150, true);
+      pintarOnda(document.getElementById("onda3"), 150, true);
+      pintarOnda(document.getElementById("onda5"), 96, true);
+      pintarOnda(document.getElementById("onda6"), 150, true);
+      // La misma voz, ya sin los trozos muertos: continua, sin huecos.
+      pintarOnda(document.getElementById("onda6b"), 112, false);
+
+      // Escena 4 · las palabras con su milisegundo
+      const PALABRAS = [
+        ["0,42", "cuando"], ["0,71", "empezamos"], ["1,14", "esto"],
+        ["1,38", "no"], ["1,52", "existía"], ["2,06", "todavía"],
+      ];
+      document.getElementById("palabras4").innerHTML = PALABRAS
+        .map(([ms, p], i) =>
+          '<div class="fila" id="f' + i + '"><span class="ms">' + ms + ' s</span>' +
+          '<span class="pal">' + p + "</span></div>")
+        .join("");
+
+      // Escena 5 · la tira de fotogramas y los rotulos alineados
+      document.getElementById("tira5").innerHTML =
+        Array.from({ length: 12 }, (_, i) => '<b id="fr' + i + '"></b>').join("");
+      document.getElementById("rot5").innerHTML =
+        ["esto", "se", "arma", "con", "una", "sola", "imagen"]
+          .map((p) => "<span>" + p + "</span>").join("");
+
+      /* ------------------------------ linea de tiempo ------------------------------ */
+      window.__timelines = window.__timelines || {};
+      const tl = gsap.timeline({ paused: true });
+
+      // 1 · el gancho. Entra duro y se queda quieto.
+      tl.from("#t1", { opacity: 0, y: 44, duration: 0.72, ease: "power3.out" }, 0.25);
+      tl.from("#t1 .ac", { color: "#FAF6F1", duration: 0.5 }, 1.25);
+
+      // 2 · la onda crece de izquierda a derecha, despues se marcan las zonas
+      tl.from("#onda2 i", {
+        scaleY: 0, duration: 0.5, ease: "power2.out",
+        stagger: { each: 0.0042, from: "start" },
+      }, 4.45);
+      tl.from("#e2 .etiqueta", { opacity: 0, x: -24, duration: 0.5 }, 4.45);
+      tl.from("#m1", { opacity: 0, y: -20, duration: 0.42 }, 6.05);
+      tl.from("#m2", { opacity: 0, y: -20, duration: 0.42 }, 6.75);
+      tl.from("#m3", { opacity: 0, y: -20, duration: 0.42 }, 7.45);
+
+      // 3 · la onda queda de fondo, apagada. El titular manda.
+      tl.from("#t3", { opacity: 0, y: 36, duration: 0.7, ease: "power3.out" }, 10.35);
+      tl.from("#t3 .ac", { color: "#FAF6F1", duration: 0.45 }, 11.5);
+
+      // 4 · una linea por vez. Esto ES el ritmo de la escena.
+      PALABRAS.forEach((_, i) => {
+        tl.from("#f" + i, { opacity: 0, x: -30, duration: 0.42, ease: "power2.out" },
+          14.9 + i * 0.3);
+      });
+      tl.from("#p4", { opacity: 0, duration: 0.6 }, 17.1);
+
+      // 5 · la vista compuesta se arma en tres capas, de arriba abajo
+      tl.from("#e5 .etiqueta", { opacity: 0, x: -24, duration: 0.5 }, 20.3);
+      tl.from("#tira5 b", { opacity: 0, scaleY: 0.4, duration: 0.45, stagger: 0.035 }, 20.65);
+      tl.from("#onda5 i", { scaleY: 0, duration: 0.4, stagger: 0.0055 }, 21.6);
+      tl.from("#rot5 span", { opacity: 0, y: 14, duration: 0.4, stagger: 0.05 }, 22.6);
+      // el cuadro que se esta mirando se enciende
+      tl.to("#fr5", { opacity: 0.9, duration: 0.45 }, 23.6);
+      tl.to("#fr5", { opacity: 0.22, duration: 0.5 }, 25.0);
+
+      // 6 · los trozos muertos se marcan, se van, y lo que queda se junta.
+      //     La union NO se hace encogiendo barras: los huecos del gap
+      //     sobrevivirian y la imagen diria "fragmentado" justo cuando el
+      //     texto dice "junto". Se cruza a una onda continua de verdad.
+      gsap.set("#onda6b", { opacity: 0 });
+      tl.from("#e6 .etiqueta", { opacity: 0, x: -24, duration: 0.5 }, 26.8);
+      tl.from("#onda6 i", { scaleY: 0, duration: 0.35, stagger: 0.0028 }, 26.8);
+
+      const barras6 = document.querySelectorAll("#onda6 i");
+      barras6.forEach((b, i) => {
+        const x = i / barras6.length;
+        if (esMuerta(x)) {
+          // primero se delatan en naranja, despues se van
+          tl.to(b, { background: "#FF6A2B", duration: 0.3 }, 28.5);
+          tl.to(b, { opacity: 0, scaleY: 0, duration: 0.45, ease: "power2.in" }, 29.3);
+        }
+      });
+      // lo que sirve se junta: cruce a la onda continua
+      tl.to("#onda6", { opacity: 0, duration: 0.45, ease: "power2.inOut" }, 29.9);
+      tl.to("#onda6b", { opacity: 1, duration: 0.55, ease: "power2.out" }, 30.0);
+      tl.from("#onda6b i", { scaleY: 0, duration: 0.4, stagger: 0.004 }, 30.0);
+      tl.from("#p6", { opacity: 0, y: 18, duration: 0.55 }, 30.6);
+
+      // 7 · el limite honesto. Calma: nada se mueve rapido.
+      tl.from("#t7", { opacity: 0, y: 30, duration: 0.7, ease: "power3.out" }, 32.3);
+      tl.from("#t7 .ac", { color: "#FAF6F1", duration: 0.45 }, 33.2);
+      tl.from("#reglas7 .capsula", { opacity: 0, x: -26, duration: 0.45, stagger: 0.24 }, 33.5);
+
+      // 8 · la marca. Mismo gesto que el cierre de 6 s: el embudo se cierra.
+      tl.from("#b1", { opacity: 0, x: -30, duration: 0.55, ease: "power3.out" }, 36.75);
+      tl.from("#b2", { opacity: 0, x: -30, duration: 0.55, ease: "power3.out" }, 36.89);
+      tl.from("#b3", { opacity: 0, x: -30, duration: 0.55, ease: "power3.out" }, 37.03);
+      tl.from("#isotipo", { scale: 1.06, duration: 0.85, ease: "power2.out" }, 36.75);
+      tl.from("#logo8", { opacity: 0, y: 30, duration: 0.65, ease: "power3.out" }, 37.7);
+      tl.from(".logotipo .via", { color: "#FAF6F1", duration: 0.5 }, 38.2);
+      tl.from("#regla-cierre", { scaleX: 0, duration: 0.6, ease: "power2.out" }, 38.5);
+      tl.from("#firma", { opacity: 0, y: 32, duration: 0.7, ease: "power3.out" }, 38.9);
+      // respiracion: el cuadro no se congela
+      tl.to("#isotipo", { y: -6, duration: 1.6, ease: "sine.inOut" }, 39.4);
+
+      tl.seek(0);
+      window.__timelines["main"] = tl;
+    </script>
+  </body>
+</html>
