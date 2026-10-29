@@ -53,6 +53,31 @@ estructura, solo cambiarle los datos.
 
 ---
 
+**0.5 · Todo juicio que tomé solo se dice, en una línea, con su razón.**
+`[Santiago · 28-oct-2026]`
+No basta con decidir bien. Si la decisión no se dice, no se puede corregir, y
+quien recibe el trabajo no sabe si fue criterio o descuido.
+
+*De dónde salió:* se entregó una grabación con subtítulos y nada más. La
+decisión era defendible (los gráficos taparían la pantalla que hay que ver),
+pero nunca se dijo. Veredicto textual: **"¿Cuál fue el juicio? No me lo
+preguntó."** El reclamo no era por el efecto que faltaba: era por la frase que
+faltaba. Ver `ENCARGO.md` §1, cajón 3.
+
+**0.6 · Un audio con ruido no se entrega, aunque nadie lo pida.**
+`[Santiago · 28-oct-2026]`
+Limpiar el ruido de fondo está en el cajón de "hazlo", no en el de "pregunta".
+Cadena base en `ENCARGO.md` §5. El límite: si se **oye** que el audio fue
+procesado, se pasó.
+
+**0.7 · El color se revisa siempre. Cambiarlo es otra cosa.**
+`[Santiago · 28-oct-2026]`
+Revisar es obligatorio. Cambiar es un juicio que se dice. Y cuando se cambia,
+**menos de lo que uno quiere**: emparejar los clips entre sí es casi siempre
+necesario; el grado casi siempre sobra.
+
+---
+
 ## 1. Antes de tocar nada
 
 **1.1 · Cada archivo que entra tiene UN trabajo.**
@@ -111,6 +136,16 @@ la cara.
 
 **3.5 · Todo dentro de la zona segura** de la plataforma. Nada de texto en el
 20 % inferior en vertical.
+
+**3.8 · El aire de una caja de texto se mide, no se calcula de memoria.**
+`[Santiago · 28-oct-2026]`
+Arriba y abajo tienen que dar **el mismo número**. Y el aire no se mide contra
+el alto de la línea: se mide contra el **alto real del glifo**, que es lo que
+el ojo ve.
+
+*De dónde salió:* la cápsula de subtítulos tenía 20 px arriba y 24 abajo. Nadie
+lo midió; salió de un `alto = alto_fila * filas + 44` escrito de memoria. Se
+nota, y lo notó él.
 
 **3.6 · Ritmo: algo cambia cada 2 a 3 segundos.** Pero cambiar por cambiar
 satura. Si todo se mueve, nada resalta.

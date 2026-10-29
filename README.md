@@ -18,10 +18,11 @@ sonorizar, revisar y entregar. En español, con la marca de quien pide.
 | **`docs/REGLAS.md`** | El criterio. Lo único que no se baja de ningún repo |
 | **`docs/REGISTRO-VISUAL.md`** | Cómo se decide cómo se tiene que ver algo, antes de dibujar |
 | **`docs/HERRAMIENTAS.md`** | Qué se usa, con qué licencia, y qué reemplaza a lo de pago |
+| **`docs/ENCARGO.md`** | Qué hacer cuando llega material y nadie dijo qué hacer. Los tres cajones |
 | **`docs/GOTCHAS.md`** | Lo que rompe el pipeline en silencio. Todo encontrado con material real |
 
 Si solo vas a leer una cosa: `REGLAS.md`. Lo demás es cómo se ejecutan esas
-reglas.
+reglas. Si vas a recibir un encargo: `ENCARGO.md` primero.
 
 ---
 

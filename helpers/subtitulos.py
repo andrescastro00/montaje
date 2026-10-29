@@ -1,89 +1,131 @@
 #!/usr/bin/env python3
 """
-Capa de subtitulos como overlay con alfa, en la marca de RegiaVia.
-Este ffmpeg no trae drawtext ni libass, asi que la banda se dibuja aqui.
+Subtitulos como capa con alfa, en la marca del cliente.
+
+Se dibujan aqui porque el ffmpeg de este Mac no trae drawtext ni libass
+(GOTCHAS 5). Y resulta mejor: asi llevan la tipografia y los colores de
+verdad, no los que libass acepte.
+
+REGLA 3.8: el aire de la caja se mide contra el ALTO REAL DEL GLIFO, no
+contra el alto de linea. Arriba y abajo dan el mismo numero. Una version
+anterior tenia 20 px arriba y 24 abajo, calculados de memoria, y se notaba.
 """
-import json, re, os
+import os
 from PIL import Image, ImageDraw, ImageFont
 
-W, H = 1920, 250
-ESPRESSO = (26, 19, 16)
-CREMA = (250, 246, 241)
-NARANJA = (255, 106, 43)
-FUENTE = "/Users/santiagocastro/Library/Fonts/Archivo-var.ttf"
+# ------------------------------------------------------------------ marca
+MARCAS = {
+    "regiavia": {
+        "fuente": "/Users/santiagocastro/Library/Fonts/Archivo-var.ttf",
+        "peso": 800,
+        "tinta": (250, 246, 241),
+        "caja": (26, 19, 16),
+        "acento": (255, 106, 43),
+    },
+    "mecatronisis": {
+        "fuente": "/Users/santiagocastro/Library/Fonts/Archivo-var.ttf",
+        "peso": 800,
+        "tinta": (255, 255, 255),
+        "caja": (18, 18, 18),
+        "acento": (255, 180, 0),
+    },
+}
 
-os.makedirs("subs", exist_ok=True)
+AIRE_X = 52          # aire a izquierda y derecha, dentro de la capsula
+AIRE_Y = 30          # MISMO numero arriba y abajo. No se toca uno sin el otro.
+OPACIDAD_CAJA = 224
 
-def fuente(px, peso=800):
-    f = ImageFont.truetype(FUENTE, px)
+
+def fuente(ruta, px, peso):
+    f = ImageFont.truetype(ruta, px)
     try:
         f.set_variation_by_axes([peso])
     except Exception:
         pass
     return f
 
-F = fuente(60, 800)
 
-# Lee los tiempos ya remapeados que escribio montar.py
-lineas = []
-for ln in open("subs.ass", encoding="utf-8"):
-    if not ln.startswith("Dialogue:"):
-        continue
-    partes = ln.split(",", 9)
-    def seg(s):
-        h, m, rest = s.split(":")
-        return int(h) * 3600 + int(m) * 60 + float(rest)
-    lineas.append((seg(partes[1]), seg(partes[2]), partes[9].strip()))
-
-def caja(texto):
-    img = Image.new("RGBA", (W, H), (0, 0, 0, 0))
-    d = ImageDraw.Draw(img)
-    # parte el texto si no cabe
-    maxw = W - 380
-    palabras, filas, act = texto.split(), [], ""
-    for p in palabras:
+def partir(d, texto, F, ancho_max, max_filas=2):
+    filas, act = [], ""
+    for p in texto.split():
         probar = (act + " " + p).strip()
-        if d.textlength(probar, font=F) <= maxw:
+        if d.textlength(probar, font=F) <= ancho_max or not act:
             act = probar
         else:
-            if act:
-                filas.append(act)
+            filas.append(act)
             act = p
     if act:
         filas.append(act)
-    filas = filas[:2]
+    return filas[:max_filas]
 
-    alto_f = 74
-    alto = alto_f * len(filas) + 44
-    ancho = max(d.textlength(f, font=F) for f in filas) + 96
-    x0 = (W - ancho) / 2
-    y0 = (H - alto) / 2
-    # capsula completa, nunca esquina suave
+
+def caja(texto, W, H, marca="regiavia", px=60, acentuar=()):
+    """Una capsula con el texto centrado. `acentuar` son palabras en el color
+    de acento: sirve para que una idea resalte sin cambiar de tamano."""
+    m = MARCAS[marca]
+    img = Image.new("RGBA", (W, H), (0, 0, 0, 0))
+    d = ImageDraw.Draw(img)
+    F = fuente(m["fuente"], px, m["peso"])
+
+    filas = partir(d, texto, F, W - 380)
+
+    # --- el alto REAL de los glifos de estas filas, no el alto de linea ---
+    cajas = [d.textbbox((0, 0), f, font=F) for f in filas]
+    sobre = min(c[1] for c in cajas)          # cuanto baja el glifo mas alto
+    bajo = max(c[3] for c in cajas)           # hasta donde llega el mas bajo
+    alto_glifo = bajo - sobre
+    salto = int(px * 1.16)                    # separacion entre filas
+    alto_texto = alto_glifo + salto * (len(filas) - 1)
+
+    ancho_texto = max(c[2] - c[0] for c in cajas)
+    # enteros en todo: con flotantes el borde redondeado se antialiasa
+    # distinto arriba que abajo y el aire sale desparejo por 1 o 2 px.
+    ancho = int(round(ancho_texto)) + AIRE_X * 2
+    alto = int(round(alto_texto)) + AIRE_Y * 2   # <- el mismo arriba y abajo
+
+    x0 = int((W - ancho) // 2)
+    y0 = int((H - alto) // 2)
     d.rounded_rectangle([x0, y0, x0 + ancho, y0 + alto],
-                        radius=alto / 2, fill=ESPRESSO + (222,))
+                        radius=alto / 2, fill=m["caja"] + (OPACIDAD_CAJA,))
+
+    # El texto se ancla restando `sobre`: asi el aire de arriba es AIRE_Y
+    # de verdad, medido hasta el pixel mas alto que se pinta.
+    y = y0 + AIRE_Y - sobre
     for i, f in enumerate(filas):
-        tw = d.textlength(f, font=F)
-        d.text(((W - tw) / 2, y0 + 20 + i * alto_f), f, font=F, fill=CREMA)
+        c = cajas[i]
+        x = int((W - (c[2] - c[0])) // 2 - c[0])
+        if acentuar:
+            # palabra por palabra, para pintar las acentuadas distinto
+            cx = x
+            for w in f.split():
+                col = m["acento"] if w.strip(",.:;!?").upper() in acentuar else m["tinta"]
+                d.text((cx, y + i * salto), w, font=F, fill=col)
+                cx += d.textlength(w + " ", font=F)
+        else:
+            d.text((x, y + i * salto), f, font=F, fill=m["tinta"])
     return img
 
-vacio = Image.new("RGBA", (W, H), (0, 0, 0, 0))
-vacio.save("subs/vacio.png")
 
-concat, cursor, n = [], 0.0, 0
-for ini, fin, txt in lineas:
-    if ini > cursor + 0.04:
-        concat.append(("subs/vacio.png", ini - cursor))
-    p = f"subs/s{n:04d}.png"
-    caja(txt).save(p)
-    concat.append((p, max(0.12, fin - ini)))
-    cursor = fin
-    n += 1
+def comprobar_aire(marca="regiavia", px=60):
+    """Mide el aire real arriba y abajo. REGLA 3.8: se mide, no se confia."""
+    img = caja("PRUEBA DE AIRE", 1920, 250, marca, px)
+    a = img.split()[3]
+    filas = [y for y in range(img.height) if max(a.crop((0, y, img.width, y + 1)).getdata()) > 0]
+    if not filas:
+        return None
+    top_caja, bot_caja = filas[0], filas[-1]
+    px_texto = []
+    for y in range(top_caja, bot_caja + 1):
+        fila = img.crop((0, y, img.width, y + 1)).convert("RGB").getdata()
+        if any(p[0] > 200 and p[1] > 200 for p in fila):
+            px_texto.append(y)
+    arriba = px_texto[0] - top_caja
+    abajo = bot_caja - px_texto[-1]
+    return arriba, abajo
 
-with open("subs/lista.txt", "w") as fh:
-    for p, dur in concat:
-        fh.write(f"file '{os.path.abspath(p)}'\nduration {dur:.3f}\n")
-    fh.write(f"file '{os.path.abspath(concat[-1][0])}'\n")
 
-print(f"cajas dibujadas : {n}")
-print(f"tramos en pista : {len(concat)}")
-print(f"largo de pista  : {sum(d for _, d in concat):.2f} s")
+if __name__ == "__main__":
+    a, b = comprobar_aire()
+    print(f"aire arriba: {a} px   aire abajo: {b} px   diferencia: {abs(a-b)} px")
+    assert abs(a - b) <= 1, "la caja quedo asimetrica (REGLA 3.8)"
+    print("simetrica, pasa")
