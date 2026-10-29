@@ -354,16 +354,60 @@ highpass 85  →  WPE (eco)  →  EQ medida (tono)  →  afftdn (ruido)
              →  de-esser  →  compresor  →  loudnorm en pasada aparte
 ```
 
-**9.12 · Lo que NO se puede hacer, y hay que decirlo.**
-Adobe Enhance Speech no tiene equivalente instalado. Lo que hace Adobe es
-**resintetizar** la voz con un modelo generativo: queda impecable y a veces deja
-de ser la voz de la persona. El camino abierto más parecido es
-`resemble-enhance`, que pide Python 3.10+ (aquí hay 3.9 y 3.15) y arrastra
-`deepspeed`. `deepfilternet` sí instala, pero exige `numpy<2` y degrada el numpy
-del sistema (GOTCHAS 15).
+**9.12 · El eco de un cuarto chico solo lo quita un modelo GENERATIVO.**
+Esto se probó con el oído de Santiago de por medio: después de arreglarle el
+tono, seguía oyendo el cuarto. Se midió y se probó todo lo que hay:
 
-Entonces: `realzar_voz.py` solo **resta y ecualiza**. No puede inventar lo que
-el micrófono no capturó, pero tampoco puede cambiar a quien habla. Si hace falta
-más, la salida honesta es decirlo y ofrecerle a Santiago pasar el archivo por
-Adobe Podcast él mismo: es su voz y es su decisión subirla a un servicio
-ajeno, no la mía.
+| Herramienta | Qué hace | Qué quitó |
+|---|---|---|
+| `afftdn` y compañía | quitan ruido | nada de eco, no es su trabajo |
+| WPE (`nara_wpe`) | resta la cola tardía | RT60 0,37 → 0,29 s, y en reflexiones tempranas un 9 % dañando la voz |
+| 7 modelos de UVR | restan la reverb | **nada**: −28 a −59 dB de energía, SRMR sin moverse |
+| Resemble Enhance | **resintetiza la voz** | RT60 1,27 → **0,14 s** |
+
+Los siete de UVR (DeEcho-DeReverb, De-Echo-Normal, De-Echo-Aggressive,
+aufr33-jarredou y tres MelBand Roformer, uno con SDR 19,17) están entrenados
+con voces de **música** y reverb artificial de plancha o sala. No se activan
+con una voz real grabada con celular en un cuarto de verdad.
+
+**La línea que separa lo que sirve de lo que no es restar contra generar.**
+Un cuarto chico no agrega una cola larga: agrega reflexiones a 3 y 5 ms que se
+suman a la voz misma y la peinan. Eso no se puede restar, porque está dentro
+del sonido directo. Solo se arregla volviendo a generar la voz.
+
+**9.13 · Con un modelo generativo, `tau = 0` y se comprueba transcribiendo.**
+Con los valores por omisión, Resemble Enhance inventa. Medido en la misma toma:
+
+```
+tau=0,5  nfe=64    "calcomanía"              ->  "pescomanía"
+                   "Escríbanos por WhatsApp" ->  "Estriba nuestro WhatsApp"
+tau=0,0  nfe=128   idéntico a la toma cruda, palabra por palabra
+```
+
+`tau` es la temperatura. En 0 el modelo deja de muestrear al azar, así que
+además de no inventar **es determinista**, y el montaje se puede repetir
+(REGLAS 1.2). Y aun así se comprueba: `quitar_eco.py` transcribe entrada y
+salida y compara. Un modelo que reescribe la onda puede reescribir la palabra;
+la transcripción no es un lujo, es la condición para usarlo.
+
+**Mezclar el modelo con el original no sirve.** Probado en 40, 60, 75 y 90 %:
+el RT60 se queda en 1,27 s hasta el 100 %. El eco está en el original y
+cualquier dosis lo devuelve entero.
+
+**9.14 · Después de un modelo generativo, las fronteras se mueven, y NO se
+reajustan a ciegas.**
+La duración se conserva al milisegundo, pero los finales de palabra caen hasta
+47 ms más tarde. Ajustar cada frontera buscando energía en el archivo nuevo
+parece lo obvio y está mal: metía de vuelta "o el material que usted se
+imagina" y "al alcance de todos ustedes", las dos frases que se habían cortado
+a propósito. Lo correcto: **se mantienen los tiempos del EDL**, se amplía el
+margen de salida, y el margen se topa contra las zonas que se botaron.
+El corte editorial manda sobre el detector.
+
+**9.15 · Lo que sigue sin poder hacerse.**
+Resemble Enhance no es magia: reconstruye la voz a partir de lo que el
+micrófono capturó. Si el micrófono no capturó una banda, no aparece. Y lo que
+de verdad arregla un cuarto chico sigue siendo **grabar cerca**: el sonido
+directo cae con la distancia y las reflexiones no, así que acercarse de 40 a
+10 cm sube la relación directo/cuarto unos 12 dB. Eso es más de lo que logra
+cualquier modelo, y es gratis.

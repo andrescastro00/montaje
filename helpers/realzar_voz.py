@@ -28,7 +28,7 @@ queda impecable y a veces deja de ser la voz de la persona. Esto solo resta
 y ecualiza, asi que no puede inventar lo que el microfono no capto, pero
 tampoco puede cambiar a quien habla.
 """
-import os, subprocess, sys, tempfile, wave
+import json, os, re, subprocess, sys, tempfile, wave
 import numpy as np
 from scipy.signal import firwin2, fftconvolve
 
@@ -48,6 +48,27 @@ SR = 48000
 def _ff(ent, sal, af):
     subprocess.run(["ffmpeg","-y","-v","error","-i",ent,"-af",af,
                     "-ar",str(SR),"-ac","1","-c:a","pcm_s16le",sal], check=True)
+
+
+def _loudnorm(ent, sal, I, TP=-1.5, LRA=9):
+    """loudnorm en DOS pasadas, con ganancia lineal.
+
+    En una pasada, `loudnorm` aplica dinamica mientras avanza y eso CAMBIA
+    el tono: medido, se comia 1,5 dB de la correccion de ecualizacion que
+    se acababa de calcular. En dos pasadas se mide primero y despues se
+    aplica una ganancia pareja, que no toca el espectro.
+    """
+    r = subprocess.run(["ffmpeg","-hide_banner","-i",ent,"-af",
+        f"loudnorm=I={I}:TP={TP}:LRA={LRA}:print_format=json","-f","null","-"],
+        capture_output=True, text=True).stderr
+    try:
+        j = json.loads(r[r.rindex("{"):r.rindex("}")+1])
+        _ff(ent, sal, f"loudnorm=I={I}:TP={TP}:LRA={LRA}:linear=true"
+                      f":measured_I={j['input_i']}:measured_LRA={j['input_lra']}"
+                      f":measured_TP={j['input_tp']}"
+                      f":measured_thresh={j['input_thresh']}")
+    except Exception:
+        _ff(ent, sal, f"loudnorm=I={I}:TP={TP}:LRA={LRA}")
 
 def leer(p):
     w=wave.open(p); n=w.getnframes(); sr=w.getframerate(); ch=w.getnchannels()
@@ -171,7 +192,7 @@ def ecualizar(x, sr, centros, d):
 
 
 # ----------------------------------------------------------------- el pase
-def realzar(entrada, salida, fuerza=1.0, lufs=-16.0, informe=False):
+def realzar(entrada, salida, fuerza=1.0, lufs=-16.0, informe=False, modelo=True):
     tmp=tempfile.mkdtemp(prefix="realzar_")
     a=os.path.join(tmp,"a.wav")
     # 85 Hz: debajo de ahi no hay voz, solo cuarto y manos en el telefono
@@ -179,17 +200,30 @@ def realzar(entrada, salida, fuerza=1.0, lufs=-16.0, informe=False):
     x,sr=leer(a)
 
     rt0,fiable=rt60(x,sr); sep0=separacion(x,sr)
-    # El eco manda los taps: cuarto mas vivo, ventana de prediccion mas larga.
-    if not fiable:
+
+    # --- el eco ---------------------------------------------------------
+    # Primero el modelo generativo, que es lo unico que de verdad quita el
+    # eco de un cuarto chico (ver quitar_eco.py: siete modelos que RESTAN
+    # no quitaron nada). WPE queda de respaldo si el modelo no esta.
+    sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+    import quitar_eco
+    via="nada"
+    if modelo and quitar_eco.disponible():
+        m=os.path.join(tmp,"m.wav")
+        quitar_eco.quitar(a, m)
+        z,_=leer(m); via="Resemble Enhance"
+        rt1,_=rt60(z,sr)
+    elif not fiable:
         # Sin una medida que se sostenga no se desreverbera a ciegas: WPE mal
         # ajustado vacia las consonantes.
-        z, rt1, taps = x, 0.0, 0
+        z, rt1 = x, 0.0
     else:
+        # El eco manda los taps: cuarto mas vivo, ventana mas larga.
         taps=20 if rt0<0.45 else (30 if rt0<0.75 else 40)
-        z=desreverberar(x,sr,taps)
+        z=desreverberar(x,sr,taps); via=f"WPE taps={taps}"
         rt1,_=rt60(z,sr)
         if rt1<=0 or rt1>rt0*0.98:   # no empeorar ni gastar por nada
-            z, rt1, taps = x, rt0, 0
+            z, rt1, via = x, rt0, "nada (WPE no ayudo)"
 
     centros,cur,obj,d = correccion(z,sr,fuerza)
     y=ecualizar(z,sr,centros,d)
@@ -198,19 +232,17 @@ def realzar(entrada, salida, fuerza=1.0, lufs=-16.0, informe=False):
     sep1=separacion(y,sr)
     b=os.path.join(tmp,"b.wav"); escribir(b,y,sr)
     # Realzar presencia sube tambien el siseo: el de-esser va DESPUES del EQ.
+    # Si paso por el modelo generativo, el audio ya sale limpio y afftdn solo
+    # puede estropearlo: se omite.
     c=os.path.join(tmp,"c.wav")
-    _ff(b, c, "afftdn=nf=-30:tn=1,deesser=i=0.45:f=0.25,"
+    cadena=("" if via=="Resemble Enhance" else "afftdn=nf=-30:tn=1,")
+    _ff(b, c, cadena + "deesser=i=0.45:f=0.25,"
               "acompressor=threshold=-19dB:ratio=3:attack=10:release=200")
     # loudnorm en pasada aparte · GOTCHAS 6
     _ff(c, salida, f"loudnorm=I={lufs}:TP=-1.5:LRA=9")
 
     fin,_=leer(salida)
-    if not fiable:
-        print("eco  (RT60)        no medible (el piso de ruido tapa la cola);"
-              " no se desreverbera")
-    else:
-        print(f"eco  (RT60)        {rt0:5.2f} s  ->  {rt1:5.2f} s"
-              + (f"   (WPE taps={taps})" if taps else "   (WPE no ayudo, no se uso)"))
+    print(f"eco  (RT60)        {rt0:5.2f} s  ->  {rt1:5.2f} s   ({via})")
     print(f"separacion         {sep0:5.1f} dB ->  {sep1:5.1f} dB  (antes de comprimir)")
     print(f"inclinacion a presencia  {d[(centros>=2000)&(centros<=4000)].mean()-d[(centros>=160)&(centros<=315)].mean():+5.1f} dB")
     print(f"destino            {lufs} LUFS")
@@ -235,4 +267,5 @@ if __name__=="__main__":
     if len(sys.argv)<3: print(__doc__); sys.exit(1)
     fz=1.0
     if "--fuerza" in sys.argv: fz=float(sys.argv[sys.argv.index("--fuerza")+1])
-    realzar(sys.argv[1], sys.argv[2], fuerza=fz, informe="--informe" in sys.argv)
+    realzar(sys.argv[1], sys.argv[2], fuerza=fz, informe="--informe" in sys.argv,
+            modelo="--sin-modelo" not in sys.argv)

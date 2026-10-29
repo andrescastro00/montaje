@@ -295,3 +295,76 @@ viejo, se descarta.
 
 Lo que sí se puede instalar sin romper nada, y es lo que resolvió el problema:
 `nara_wpe` (puro numpy/scipy, desreverberación WPE).
+
+---
+
+## 16. `loudnorm` en una pasada se come la ecualización
+
+Se calculó una corrección de tono medida, se aplicó, y el error contra la
+curva de locución quedó en **0,9 dB**. Al final de la cadena, **2,4 dB**.
+Nadie había tocado el EQ.
+
+Era `loudnorm`. En una sola pasada no es una ganancia: va comprimiendo
+mientras avanza, y eso cambia el balance espectral. Medido por etapas:
+
+```
+EQ aplicado                      0,9 dB
++ de-esser i=0.45                2,1 dB   <- se come 1,2
++ compresor                      1,8 dB
++ loudnorm una pasada            2,4 dB   <- se come 1,5
+```
+
+**Dos pasadas:** medir con `print_format=json`, y aplicar con `linear=true` y
+los `measured_*`. Así es una ganancia pareja y no toca el espectro.
+
+Y el de-esser: en 0,45 estaba deshaciendo el realce de presencia que se acababa
+de calcular. Bajó a 0,20, donde no cuesta nada medible.
+
+---
+
+## 17. Comparar dos transcripciones con `zip` miente
+
+El verificador del modelo generativo dijo **7 de 88 palabras iguales, 8 %**, y
+pintaba que el modelo había destrozado la locución. Las dos transcripciones
+eran idénticas salvo **una palabra insertada**: "grabado láser" contra
+"grabado a láser".
+
+Comparar por posición desalinea todo lo que viene después de la primera
+inserción. Con `difflib.SequenceMatcher`: **87 de 88, 99 %**, y la salida dice
+exactamente cuál fue el cambio.
+
+> Un verificador que da falsos positivos se desactiva solo: a la tercera, nadie
+> lo lee. Vale más que diga QUÉ cambió que cuánto.
+
+---
+
+## 18. Un script llamado `re.py` tapa el módulo `re` de Python
+
+Se guardó un script de prueba como `re.py` en la carpeta de trabajo. El
+siguiente `python3` corrido ahí reventó dentro de `numpy`, con un error que no
+nombra el archivo:
+
+```
+AttributeError: partially initialized module 're' has no attribute 'compile'
+(most likely due to a circular import)
+```
+
+Python busca primero en el directorio actual. Aplica igual a `json.py`,
+`io.py`, `types.py`, `select.py`, `copy.py`. Los scripts de trabajo llevan
+nombre largo (`resemble_correr.py`), nunca el de un módulo de la biblioteca.
+
+---
+
+## 19. SRMR no sirve para comparar antes y después de ecualizar
+
+SRMR mide reverberación dividiendo la energía de modulación lenta (el habla)
+por la rápida (lo que agrega el cuarto). Realzar la presencia en 2-5 kHz sube
+las **consonantes**, que son modulación rápida, así que el número baja aunque
+no haya más eco. Midió −2,4 dB por una ecualización que mejoró la grabación.
+
+Sirve para comparar versiones **con el mismo balance espectral** (por ejemplo,
+siete desreverberadores sobre el mismo archivo, que fue para lo que se usó).
+Para comparar a través de un EQ hay que usar el RT60.
+
+> Toda métrica tiene una variable que la confunde. Antes de decidir con un
+> número, hay que preguntarse qué más lo mueve.
