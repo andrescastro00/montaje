@@ -18,6 +18,7 @@ sonorizar, revisar y entregar. En español, con la marca de quien pide.
 | **`docs/REGLAS.md`** | El criterio. Lo único que no se baja de ningún repo |
 | **`docs/REGISTRO-VISUAL.md`** | Cómo se decide cómo se tiene que ver algo, antes de dibujar |
 | **`docs/HERRAMIENTAS.md`** | Qué se usa, con qué licencia, y qué reemplaza a lo de pago |
+| **`docs/GOTCHAS.md`** | Lo que rompe el pipeline en silencio. Todo encontrado con material real |
 
 Si solo vas a leer una cosa: `REGLAS.md`. Lo demás es cómo se ejecutan esas
 reglas.
@@ -48,5 +49,9 @@ obra derivada. El criterio está escrito desde cero y calibrado con notas reales
 
 Arrancando. Documentación de arquitectura y criterio escrita; falta el código.
 
-**Siguiente:** el esquema de `montaje.json` y el primer extremo a extremo con
-material real.
+Primera corrida extremo a extremo hecha sobre material real: 116,6 s de
+grabación con voz, transcritos en 11,4 s, 25 cortes, 10,28 s de aire quitado,
+80 grupos de subtítulo en la marca. Ocho gotchas documentados.
+
+**Siguiente:** formalizar el esquema de `montaje.json` y meter el pipeline en
+scripts estables dentro de `helpers/`.
