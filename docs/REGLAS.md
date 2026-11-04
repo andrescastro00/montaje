@@ -411,3 +411,31 @@ de verdad arregla un cuarto chico sigue siendo **grabar cerca**: el sonido
 directo cae con la distancia y las reflexiones no, así que acercarse de 40 a
 10 cm sube la relación directo/cuarto unos 12 dB. Eso es más de lo que logra
 cualquier modelo, y es gratis.
+
+## 10. Primero se diagnostica la pieza, después se abre el motor
+
+**10.1.** Un TikTok de 10 segundos, un video de YouTube de 14 minutos y el institucional de una
+fundación respetada no son la misma pieza con distinta duración. Son gramáticas distintas: cambian
+la relación de aspecto, dónde cae el gancho, los cortes por minuto, cuánto texto cabe, si hay voz,
+si lleva subtítulos quemados y hasta si se puede hacer un chiste.
+
+**10.2.** Antes de abrir el motor se escribe la **ficha de la pieza** y se dice: qué es, dónde se
+publica, formato y duración, en qué segundo tiene que haber pasado algo, ritmo, palabras por
+pantalla, sonido, subtítulos, registro y lo prohibido para esa marca. Cinco líneas.
+
+**10.3.** El agente **decide**. No interroga. Solo pregunta cuando dos lecturas producen trabajo
+materialmente distinto y caro de rehacer: un tono nuevo, algo que cuesta plata, algo que obliga a
+volver a grabar. Se pregunta una vez, con opciones concretas y con el segundo exacto de cada
+escena de la que se hable.
+
+**10.4.** El registro de una marca no es solo cómo habla el copy: es **cómo se mueve** la pieza. La
+curva, el tiempo quieto en pantalla, si hay barrido o fundido y si cabe un chiste salen del mismo
+eje. Está en `skill/video-de-marca/referencias/diagnostico.md`.
+
+**10.5.** Las zonas de peligro de cada red se respetan siempre, y la cabeza de quien sale en cámara
+queda a 30 px o más de cualquier borde de panel, **en todos los cuadros**, no en el que se miró.
+Eso se mide, no se calcula a ojo.
+
+**10.6.** El gusto del editor con el que se trabaja **no va en la skill**: va en un `AGENTS.md`
+local, que cada persona llena con el suyo. No hay uno común. El molde está en
+`skill/video-de-marca/plantillas/AGENTS.md`.

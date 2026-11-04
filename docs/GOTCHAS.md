@@ -368,3 +368,44 @@ Para comparar a través de un EQ hay que usar el RT60.
 
 > Toda métrica tiene una variable que la confunde. Antes de decidir con un
 > número, hay que preguntarse qué más lo mueve.
+
+## 20. Dieciséis skills de video de HyperFrames quedaron huérfanas
+
+**4 de noviembre de 2026.** HyperFrames consolidó su catálogo. Quedaron **nueve** skills: el juego
+base (`hyperframes`, `hyperframes-cli`, `hyperframes-registry`, `media-use`) y cinco a pedido
+(`figma`, `slideshow`, `remotion-to-hyperframes`, `reverse-any-video`, `style-sampling`).
+
+Estas dieciséis se retiraron y su contenido se fundió en `references/types/` de `/hyperframes`:
+
+```
+general-video          motion-graphics        product-launch-video   website-to-video
+faceless-explainer     pr-to-video            talking-head-recut     music-to-video
+embedded-captions      hyperframes-animation  hyperframes-audio      hyperframes-core
+hyperframes-creative   hyperframes-keyframes  hyperframes-media      hyperframes-studio
+```
+
+**El problema es que no se van solas.** `npx hyperframes skills update` las deja intactas (el
+comando nunca borra una skill) y `skills check` no las cuenta: se quedan en la carpeta, congeladas
+en su última versión, describiendo un motor que ya cambió, y compitiendo por atención con las
+vivas. Un agente que lea `motion-graphics` va a seguir un flujo de cinco fases que ya no existe.
+
+Medido en este Mac: `skills check` dice "9 current" mientras en `~/.claude/skills` hay 25 carpetas
+de HyperFrames.
+
+**Qué hacer:** sacarlas de la carpeta de skills. Y no citarlas nunca desde un enrutador propio: la
+tabla de `skill/video-de-marca/SKILL.md` enruta solo a las nueve vivas.
+
+**Cómo se detecta en general:** si `skills check` dice "N current" y hay más de N carpetas con ese
+prefijo, las de más están huérfanas.
+
+## 21. Entrar a HyperFrames es gratis y cambia el cálculo del sonido
+
+`npx hyperframes auth login` no cuesta nada y en el plan Free abre el catálogo de más de 10.000
+pistas de música, los efectos de sonido, la búsqueda de más de 75.000 imágenes y 3 minutos al mes
+de voz.
+
+Eso **no** convierte la voz en un problema resuelto: tres minutos al mes es un borrador, y la voz
+local (Kokoro) habla español con acento que no sirve para una pieza colombiana. Pero sí retira la
+razón para rebuscar música en bancos con atribución, que era la parte lenta.
+
+Se comprueba con `npx hyperframes auth status`. Y el login lo corre **la persona**, no el agente.
