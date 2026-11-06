@@ -8,16 +8,19 @@
   Eso cambia por persona, por marca y por mes. Va aquí.
 
   CÓMO SE USA
-  1. Se copia a la raíz del proyecto o de la carpeta de trabajo, con el nombre AGENTS.md.
+  1. Trabajando desde el repo `montaje`, va en `mi/AGENTS.md`, y `./instalar.sh` ya lo copió ahí.
+     Trabajando sin el repo, se copia a la raíz de la carpeta de trabajo con el nombre AGENTS.md
+     (y duplicado idéntico como CLAUDE.md y GEMINI.md si se usa más de un agente; idénticos de
+     verdad, se comprueba con `md5 -q AGENTS.md CLAUDE.md GEMINI.md`).
   2. Se llena con lo de cada quien. Lo que no aplique se borra, no se deja en blanco.
-  3. Se duplica idéntico como CLAUDE.md y GEMINI.md si se usa más de un agente. Idénticos de
-     verdad: se comprueba con `md5 -q AGENTS.md CLAUDE.md GEMINI.md`.
+  3. No hay que llenarlo de una sentada, y NADIE debe ser interrogado para llenarlo: el agente lo
+     va llenando con cada nota que recibe.
   4. Cada vez que llega una nota sobre una entrega, se escribe aquí la REGLA que habría evitado el
      error, no la anécdota. Eso es lo que hace que la pieza veinte salga mejor que la uno.
 
-  ESTE ARCHIVO ES DE CADA QUIEN. No hay un AGENTS.md común y no se sube uno común a ningún repo
-  compartido. Dos personas que trabajen con editores distintos tienen archivos distintos, y está
-  bien.
+  ESTE ARCHIVO ES DE CADA QUIEN y NO SE SUBE. `mi/` está en el .gitignore del repo. No hay un
+  AGENTS.md común: dos personas que trabajen con editores distintos tienen archivos distintos, y
+  está bien. El oficio se comparte, el gusto no.
 
   Borrar este comentario al llenarlo.
 -->

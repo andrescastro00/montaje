@@ -2,6 +2,9 @@
 """
 Subtitulos como capa con alfa, en la marca del cliente.
 
+Las dos marcas de MARCAS son EJEMPLOS. Se agrega la del cliente con sus
+colores y su tipografia real, y se pasa su nombre en `marca=`.
+
 Se dibujan aqui porque el ffmpeg de este Mac no trae drawtext ni libass
 (GOTCHAS 5). Y resulta mejor: asi llevan la tipografia y los colores de
 verdad, no los que libass acepte.
@@ -16,14 +19,14 @@ from PIL import Image, ImageDraw, ImageFont
 # ------------------------------------------------------------------ marca
 MARCAS = {
     "regiavia": {
-        "fuente": "/Users/santiagocastro/Library/Fonts/Archivo-var.ttf",
+        "fuente": os.environ.get("MONTAJE_FUENTE", "/System/Library/Fonts/Supplemental/Arial Bold.ttf"),
         "peso": 800,
         "tinta": (250, 246, 241),
         "caja": (26, 19, 16),
         "acento": (255, 106, 43),
     },
-    "mecatronisis": {
-        "fuente": "/Users/santiagocastro/Library/Fonts/Archivo-var.ttf",
+    "oscura": {
+        "fuente": os.environ.get("MONTAJE_FUENTE", "/System/Library/Fonts/Supplemental/Arial Bold.ttf"),
         "peso": 800,
         "tinta": (255, 255, 255),
         "caja": (18, 18, 18),

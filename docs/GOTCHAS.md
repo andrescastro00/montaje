@@ -409,3 +409,29 @@ local (Kokoro) habla español con acento que no sirve para una pieza colombiana.
 razón para rebuscar música en bancos con atribución, que era la parte lenta.
 
 Se comprueba con `npx hyperframes auth status`. Y el login lo corre **la persona**, no el agente.
+
+---
+
+## 22. Con `-v error`, `showinfo` no imprime nada y el conteo sale en cero
+
+Detectar cortes con `select='gt(scene,0.30)',showinfo` y leer los `pts_time` es la forma estándar.
+Falla así:
+
+```bash
+ffmpeg -v error -i base.mp4 -filter:v "select='gt(scene,0.30)',showinfo" -f null - 2>&1 \
+  | grep -oE 'pts_time:[0-9.]+'      # devuelve VACÍO
+```
+
+`showinfo` escribe en el nivel **info**, no en el de error. Con `-v error` el filtro corre, el
+comando sale con código 0, y no imprime una sola línea. El resultado es **cero cortes** en un video
+que tiene cortes, sin ningún aviso. Medido: un video de prueba con dos cortes duros en 2,40 s y
+4,70 s daba 0 con `-v error` y los dos exactos con `-v info`.
+
+> **Todo filtro que informe midiendo (`showinfo`, `psnr`, `ssim`, `ebur128`, `blackdetect`,
+> `silencedetect`, `cropdetect`) necesita nivel `info`.** La costumbre de poner `-v error` para
+> tener una salida limpia es justamente lo que los apaga.
+
+Y el síntoma secundario: `NCORTES="$(grep -c ... || echo 0)"` en un archivo sin coincidencias
+devuelve **dos** ceros, porque `grep -c` ya imprime `0` y además sale con código 1, así que el
+`|| echo 0` agrega otro. Después `awk` recibe un salto de línea en medio del número y revienta con
+`newline in string`. Se escribe sin el `||`: `grep -c` ya hace lo correcto solo.

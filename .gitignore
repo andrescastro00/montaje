@@ -1,8 +1,23 @@
-node_modules/
+# El material NUNCA se sube. El repo es el cerebro, no la bodega.
+trabajos/
+mi/
+modelos/
+
+# Lo que se instala, no se versiona
 .venv/
+node_modules/
 __pycache__/
+*.pyc
+
+# Medios, por si alguno se cuela fuera de trabajos/
 *.mp4
 *.mov
+*.m4a
+*.mp3
 *.wav
+*.aiff
+*.webm
+*.bin
+
 .DS_Store
 .env

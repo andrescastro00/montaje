@@ -121,11 +121,12 @@ adoptarla.
 
 ## Lo que NO vamos a usar
 
-**Un producto de pago que nos recomendaron.** Es comercial, con licencia personal a
-nombre de un tercero que prohíbe compartirlo, sublicenciarlo, incluirlo en un
-producto propio y quitarle los avisos de autoría. No entra aquí, ni entero ni
-en partes, ni con los créditos cambiados.
+**Ningún producto comercial con licencia personal a nombre de un tercero.** Nos
+pasó con uno: la licencia prohibía compartirlo, sublicenciarlo, incluirlo en un
+producto propio y quitarle los avisos de autoría. No entra aquí, ni entero ni en
+partes, ni con los créditos cambiados. Si una herramienta no se puede redistribuir,
+no se mete en un repo que se clona.
 
-No hace falta: usa Whisper y ffmpeg igual que nosotros. Lo que vendía era el
-criterio, y el criterio está en `REGLAS.md`, escrito desde cero y calibrado
-con las notas de Santiago.
+Tampoco hace falta: por debajo esos productos usan Whisper y ffmpeg igual que
+nosotros. Lo que venden es el criterio, y el criterio está en `REGLAS.md`, escrito
+desde cero y calibrado con notas de ediciones reales.

@@ -439,3 +439,35 @@ Eso se mide, no se calcula a ojo.
 **10.6.** El gusto del editor con el que se trabaja **no va en la skill**: va en un `AGENTS.md`
 local, que cada persona llena con el suyo. No hay uno común. El molde está en
 `skill/video-de-marca/plantillas/AGENTS.md`.
+
+---
+
+## 11. Se mira antes de decidir, y se trabaja en local
+
+**11.1 Un agente de lenguaje no ve ni oye un video.** La falla no suena a "no puedo ver": suena a
+un plan precioso, detallado y seguro, de una pieza que no existe, escrito a partir del título y del
+nombre del archivo. Antes de proponer un tramo, se mira: hoja de contacto, fotogramas del punto de
+decisión, cortes medidos, palabras con su milisegundo. Cómo, según lo que el agente sepa hacer,
+está en `VER-VIDEO.md`.
+
+**11.2 Mirar es salir con números, no con adjetivos.** Cortes por minuto, segundo del gancho,
+palabras por pantalla, de dónde entra el texto, dónde está la cara, qué tan fuerte va la música.
+Si una referencia no se puede volver números, no se miró.
+
+**11.3 "Mire este reel" es la mejor información que va a llegar.** Casi nadie sabe describir el
+video que quiere, y casi todos saben señalar uno que les gusta. Un reel de referencia se trae, se
+mide y se convierte en la columna de la izquierda de una tabla de dos columnas. Lo ajeno es
+referencia, no material: se aprende su ritmo, no se reusan sus planos, su música ni su locución.
+
+**11.4 El trabajo es local.** El repo es el cerebro y se comparte; el material, los renders y la
+voz no salen del equipo. Al repo no se sube ni un bruto, ni un render, ni un fotograma. Si hay que
+forzar un `git add`, se está haciendo algo mal.
+
+**11.5 El oficio se comparte, el gusto no.** Lo que le sirve a cualquiera (una trampa de `ffmpeg`,
+un nivel que funciona, una medición) va a `GOTCHAS.md` o aquí. Lo que es de una persona o de una
+marca va a su `mi/AGENTS.md`, que es local y de cada quien. Esa separación es lo que permite que
+dos personas usen el mismo repo sin pisarse, y lo que lo hace útil para alguien de afuera.
+
+**11.6 Las herramientas se comprueban antes de prometer.** `./instalar.sh` corre al abrir. Prometer
+un video y fallar a los veinte minutos porque faltaba `ffmpeg` es peor que decirlo en el primer
+mensaje.

@@ -13,6 +13,7 @@ El orden importa. Primero se decide **qué** se está haciendo. Después se abre
 
 | Paso | Dónde está |
 |---|---|
+| 0. **Mirar** el material, y la referencia si la hay | `referencias/mirar.md` |
 | 1. Diagnosticar la pieza y escribir su ficha | `referencias/diagnostico.md` |
 | 2. Poner la voz de la marca | sección 2 de este archivo |
 | 3. Medir el material antes de diseñar nada | `referencias/medir.md` |
@@ -22,8 +23,18 @@ El orden importa. Primero se decide **qué** se está haciendo. Después se abre
 | 7. Entregar | sección 6 de este archivo |
 
 Lo que rompe el proceso en silencio: `referencias/trampas.md`.
+
+**El paso 0 no se salta.** Un agente de lenguaje no ve ni oye un video: si no mira, inventa, y la
+falla no suena a "no puedo ver", suena a un plan precioso de una pieza que no existe. Los cuatro
+caminos para mirar de verdad están en `referencias/mirar.md`.
 El criterio del editor con el que se trabaja: `plantillas/AGENTS.md`, que **cada persona llena con
-el suyo**. No hay uno común y no se sube uno común.
+el suyo** (en `mi/AGENTS.md` si se trabaja desde el repo `montaje`). No hay uno común y no se sube
+uno común.
+
+Si existe el repo **montaje** (github.com/andrescastro00/montaje), todo esto ya está montado para
+correr: `./instalar.sh` pone las herramientas, `./helpers/traer.sh <enlace>` baja y mide el
+material, y `./helpers/mirar.sh` lo vuelve mirable. Sin el repo, la skill funciona igual: lo que
+cambia es que los comandos hay que escribirlos a mano.
 
 ---
 
@@ -103,20 +114,24 @@ carpeta de skills. Lo que decían está hoy en `references/types/` de `/hyperfra
 
 Antes de escribir una línea del guion, resolver de quién es.
 
-**Aztec** manda `~/.claude/AZTEC.md` y el repo `~/Proyectos/aztec-copy`. Leer `CLAUDE.md`,
-`alma/SOUL-aztec.md` y el alma del canal. No se negocia: cero invención de cifras, toda cifra con
-dueño visible, prohibido "no es X, es Y", em-dash, emojis, signos de apertura, "descubre",
-"desbloquea". El resultado antes que la herramienta. Una idea por pieza.
+El orden para encontrarla, y se para en el primero que exista:
 
-**RegiaVía o Calzada**: registro **usted**, igual que regiavia.com. Sin hype. La firma es
-"Venda más. Gaste menos." El producto se llama **Calzada** y la agencia **RegiaVía**: en el login y
-en la app la marca grande es RegiaVía; en la página pública, Calzada.
+1. **`mi/AGENTS.md`** del repo, si se trabaja desde la carpeta de `montaje`. Ahí está la marca de
+   quien edita y el gusto de quien aprueba, escrito por esa persona. Manda sobre todo lo demás.
+2. **La skill de marca del cliente**, si existe una (`<cliente>-brand`, `<cliente>-copy`). Una
+   skill de marca manda sobre esta: esta pone el oficio, esa pone la marca.
+3. **La carpeta del cliente**: su índice y su `01 Contexto y marca/` (manual de marca, logos,
+   paleta, tipografía).
+4. **El sitio web del cliente**, leído de verdad, no de memoria. De ahí salen el registro (usted o
+   tú), la paleta real y las palabras que esa marca sí usa.
 
-**Un cliente**: leer su `00-INDICE.md` y su `01 Contexto y marca/`. Si tiene skill propia
-(`mecatronisis-brand`, `con-cuentas-claras-copy`, `aztec-brand`), esa manda sobre esta.
+Si después de los cuatro sigue sin haber marca, se dice en una línea y se propone una: dos colores,
+una tipografía y un registro, sacados del sitio. No se inventa un manual entero.
 
-**En todos los casos**, las reglas de cualquier texto de Santiago: sin em-dashes, sin emojis, sin
-signos de apertura. Frases cortas. Nada de autoayuda.
+**Reglas de texto que valen para toda marca, salvo que su manual diga otra cosa**: sin em-dashes,
+sin emojis, sin signos de apertura (¿ ¡), frases cortas, nada de autoayuda, cero invención de
+cifras y toda cifra con dueño visible. Son las que piden casi todos los manuales serios, y las que
+más delatan a un video hecho por una máquina.
 
 El registro también es una decisión de **diseño**, no solo de copy. Una fundación respetada y una
 agencia de IA no mueven el texto a la misma velocidad ni usan la misma curva. Eso está en
@@ -203,13 +218,21 @@ Están en sus archivos porque son largos y se consultan, no se leen de corrido:
 
 ## 6. Dónde queda el archivo
 
-Según MAPA, y nunca en el home ni en el repo:
+Trabajando desde `montaje`, cada pieza vive en su carpeta de trabajo y **nada se sube al repo**:
 
-- Video de pauta: `~/Downloads/Trabajo/<Cliente>/03 Pauta/Videos de pauta/<AAAA-MM Campaña>/`
-- Video orgánico, clase, reel: `~/Downloads/Trabajo/<Cliente>/04 Contenido/Videos/`
-- Video de un producto propio que vive en una web: junto a la web
-  (real: `pm-regiavia/public/landing/lanzamiento.mp4`)
-- Proyecto propio: `~/Downloads/Mis proyectos/<Proyecto>/04 Contenido/Videos/`
+```
+trabajos/<AAAA-MM-DD>-<pieza>/
+  bruto/      el material como llegó. No se toca nunca
+  vista/      fotogramas, hoja de contacto y vista.html para MIRAR el material
+  datos/      ficha tecnica, palabras con tiempos, cortes, mediciones
+  obra/       la composicion, los scripts, los renders de prueba
+  salida/     el mp4 final, uno solo
+  PIEZA.md    la ficha, el plan por tramos y el registro de notas
+```
+
+El entregable final se copia además a donde lo espere quien lo pidió (la carpeta del cliente, la
+carpeta pública de la web, el Drive del equipo). Si hay un mapa de carpetas en el equipo, ese
+manda; `trabajos/` es el taller, no la bodega.
 
 Reglas de entrega:
 
@@ -227,7 +250,7 @@ Reglas de entrega:
 ## 7. El plan B: cuando HyperFrames es demasiado
 
 Para una pieza chica y muy a la medida (una composición propia con pantallazos reales y texto) hay
-un camino probado que no necesita framework, en `~/Proyectos/pm-regiavia/video/`:
+un camino probado que no necesita framework, con dos archivos propios:
 
 - `escena.html` es la composición entera y expone `window.pintar(t)`, que deja la escena exacta en
   el milisegundo `t`. **Regla que no se rompe: ninguna animación ni transición de CSS.** Esas
@@ -244,8 +267,7 @@ un camino probado que no necesita framework, en `~/Proyectos/pm-regiavia/video/`
 
 ## 8. El reproductor, si el video va en una web
 
-En `~/Proyectos/pm-regiavia/src/components/landing/reproductor.tsx` hay uno con un efecto que vale
-la pena reusar: **la barra avanza rápido y va frenando** (1,6 veces la velocidad real al empezar,
+Hay un efecto probado que vale la pena reusar: **la barra avanza rápido y va frenando** (1,6 veces la velocidad real al empezar,
 0,4 al terminar). Una barra pareja le dice a quien mira "te faltan treinta segundos" en el primer
 segundo y ahí se va.
 
